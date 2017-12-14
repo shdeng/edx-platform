@@ -56,7 +56,6 @@
                     );
                     this.currentProvider = data.thirdPartyAuth.currentProvider || '';
                     this.hideSignInLink = data.thirdPartyAuth.hideSignInLink || false;
-                    this.enterpriseName = data.enterpriseName || '';
                     this.errorMessage = data.thirdPartyAuth.errorMessage || '';
                     this.platformName = data.platformName;
                     this.autoSubmit = data.thirdPartyAuth.autoSubmitRegForm;
@@ -144,7 +143,6 @@
                             fields: fields,
                             currentProvider: this.currentProvider,
                             hideSignInLink: this.hideSignInLink,
-                            enterpriseName: this.enterpriseName,
                             providers: this.providers,
                             hasSecondaryProviders: this.hasSecondaryProviders,
                             platformName: this.platformName,
