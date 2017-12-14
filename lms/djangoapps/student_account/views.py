@@ -47,6 +47,7 @@ from student.views import register_user as old_register_view
 from student.views import signin_user as old_login_view
 from third_party_auth import pipeline
 from third_party_auth.decorators import xframe_allow_whitelisted
+from third_party_auth.utils import user_exists
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 from util.date_utils import strftime_localized
 
@@ -133,12 +134,10 @@ def login_and_registration_form(request, initial_mode="login"):
     running_pipeline = pipeline.get(request)
     if running_pipeline:
         pipeline_user_details = running_pipeline['kwargs']['details']
-        if 'email' in pipeline_user_details or 'username' in pipeline_user_details:
-            # pylint: disable=invalid-name
-            qs = {'email': pipeline_user_details['email']} if pipeline_user_details.get('email') else \
-                {'username': pipeline_user_details.get('username')}
-            if User.objects.filter(**qs).exists():
-                account_creation_allowed = False
+        if user_exists(pipeline_user_details):
+            # Details sent over from identity provider belong to an existing user.
+            # So, force user to login and do not allow account creation
+            account_creation_allowed = False
 
     # Otherwise, render the combined login/registration page
     context = {
@@ -252,7 +251,6 @@ def update_context_for_enterprise(request, context):
     context = context.copy()
 
     sidebar_context = enterprise_sidebar_context(request)
-    sync_learner_profile_data = context['data']['third_party_auth']['syncLearnerProfileData']
 
     if sidebar_context:
         context['data']['registration_form_desc']['fields'] = enterprise_fields_only(
@@ -263,11 +261,6 @@ def update_context_for_enterprise(request, context):
         context['data']['hide_auth_warnings'] = True
     else:
         context['enable_enterprise_sidebar'] = False
-
-    if sync_learner_profile_data:
-        context['data']['hide_auth_warnings'] = True
-        enterprise_customer = enterprise_customer_for_request(request)
-        context['data']['enterprise_name'] = enterprise_customer and enterprise_customer['name']
 
     return context
 
@@ -349,7 +342,6 @@ def _third_party_auth_context(request, redirect_to, tpa_hint=None):
         "finishAuthUrl": None,
         "errorMessage": None,
         "registerFormSubmitButtonText": _("Create Account"),
-        "syncLearnerProfileData": False,
         "hideSignInLink": False,
     }
 
@@ -383,7 +375,6 @@ def _third_party_auth_context(request, redirect_to, tpa_hint=None):
                 context["currentProvider"] = current_provider.name
                 context["finishAuthUrl"] = pipeline.get_complete_url(current_provider.backend_name)
                 context["hideSignInLink"] = bool(current_provider.sync_learner_profile_data)
-                context["syncLearnerProfileData"] = current_provider.sync_learner_profile_data
 
                 if current_provider.skip_registration_form:
                     # For enterprise (and later for everyone), we need to get explicit consent to the
