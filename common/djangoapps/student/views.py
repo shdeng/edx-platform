@@ -2167,6 +2167,17 @@ def skip_activation_email(user, do_external_auth, running_pipeline, third_party_
         )
     )
 
+    log.info('[skip_activation_email]: Skip activation email details:')
+    log.info('[skip_activation_email]: SKIP_EMAIL_VALIDATION "%s"', settings.FEATURES.get('SKIP_EMAIL_VALIDATION', None))
+    log.info('[skip_activation_email]: AUTOMATIC_AUTH_FOR_TESTING "%s"', settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING'))
+    log.info('[skip_activation_email]: BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH "%s"', settings.FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH') and do_external_auth)
+    log.info('[skip_activation_email]: third_party_provider.skip_email_verification "%s"', third_party_provider.skip_email_verification)
+    log.info('[skip_activation_email]: valid_email "%s"', valid_email)
+
+    log.info('[skip_activation_email]: sso_pipeline_email "%s"', sso_pipeline_email)
+    log.info('[skip_activation_email]: user.email "%s"', user.email)
+    log.info('[skip_activation_email]: (third_party_provider.identity_provider_type "%s"',  third_party_provider.identity_provider_type)
+
     return (
         settings.FEATURES.get('SKIP_EMAIL_VALIDATION', None) or
         settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING') or
