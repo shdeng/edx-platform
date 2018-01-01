@@ -243,6 +243,7 @@ class CourseGrade(CourseGradeBase):
     """
     def __init__(self, user, course_data, *args, **kwargs):
         super(CourseGrade, self).__init__(user, course_data, *args, **kwargs)
+        self.passed = self._compute_passed(course_data.course.grade_cutoffs, self.percent)
         self._subsection_grade_factory = SubsectionGradeFactory(user, course_data=course_data)
 
     def update(self):

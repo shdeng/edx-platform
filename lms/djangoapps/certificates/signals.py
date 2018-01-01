@@ -66,7 +66,7 @@ def _listen_for_id_verification_status_changed(sender, user, **kwargs):  # pylin
     grade_factory = CourseGradeFactory()
     expected_verification_status, _ = SoftwareSecurePhotoVerification.user_status(user)
     for enrollment in user_enrollments:
-        if grade_factory.read(user=user, course=enrollment.course_overview).passed:
+        if grade_factory.read(user=user, course_key=enrollment.course_overview.id).passed:
             if fire_ungenerated_certificate_task(user, enrollment.course_id, expected_verification_status):
                 message = (
                     u'Certificate generation task initiated for {user} : {course} via track change ' +
