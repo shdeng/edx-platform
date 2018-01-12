@@ -97,9 +97,19 @@ function run_paver_quality {
     return 0;
 }
 
+# Call this to skip re-installation of prerequisites inside a tox execution.
+# Safe (and faster) for unit tests, not safe for bok-choy, JS, or lettuce due
+# to node dependencies.
+function no_prereq_install_in_tox {
+    if [[ -n "$TOX" ]]; then
+        export NO_PREREQ_INSTALL="True"
+    fi
+}
+
 case "$TEST_SUITE" in
 
     "quality")
+        no_prereq_install_in_tox
         echo "Finding fixme's and storing report..."
         run_paver_quality find_fixme || EXIT=1
         echo "Finding pep8 violations and storing report..."
@@ -130,6 +140,7 @@ case "$TEST_SUITE" in
         ;;
 
     "lms-unit")
+        no_prereq_install_in_tox
         case "$SHARD" in
             "all")
                 $TOX paver test_system -s lms --disable_capture $PAVER_ARGS $PARALLEL 2> lms-tests.log
@@ -152,10 +163,12 @@ case "$TEST_SUITE" in
         ;;
 
     "cms-unit")
+        no_prereq_install_in_tox
         $TOX paver test_system -s cms --disable_capture $PAVER_ARGS 2> cms-tests.log
         ;;
 
     "commonlib-unit")
+        no_prereq_install_in_tox
         $TOX paver test_lib --disable_capture $PAVER_ARGS 2> common-tests.log
         ;;
 
