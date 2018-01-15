@@ -1674,7 +1674,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.generate_certificate(
             "http://www.example.com/certificate.pdf", "honor"
         )
-        with patch('certificates.api.certificate_downloadable_status',
+        with patch('lms.djangoapps.certificates.api.certificate_downloadable_status',
                    return_value=self.mock_certificate_downloadable_status(is_downloadable=True)):
             response = views._get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
 
@@ -1688,7 +1688,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.generate_certificate(
             "http://www.example.com/certificate.pdf", "honor"
         )
-        with patch('certificates.api.certificate_downloadable_status',
+        with patch('lms.djangoapps.certificates.api.certificate_downloadable_status',
                    return_value=self.mock_certificate_downloadable_status(is_generating=True)):
             response = views._get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
 
@@ -1702,7 +1702,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.generate_certificate(
             "http://www.example.com/certificate.pdf", "honor"
         )
-        with patch('certificates.api.certificate_downloadable_status',
+        with patch('lms.djangoapps.certificates.api.certificate_downloadable_status',
                    return_value=self.mock_certificate_downloadable_status(is_unverified=True)):
             response = views._get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
 
@@ -1716,7 +1716,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.generate_certificate(
             "http://www.example.com/certificate.pdf", "honor"
         )
-        with patch('certificates.api.certificate_downloadable_status',
+        with patch('lms.djangoapps.certificates.api.certificate_downloadable_status',
                    return_value=self.mock_certificate_downloadable_status()):
             response = views._get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
 
