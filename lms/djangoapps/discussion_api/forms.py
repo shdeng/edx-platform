@@ -7,6 +7,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseLocator
 
 from openedx.core.djangoapps.util.forms import ExtendedNullBooleanField, MultiValueField
+from openedx.core.lib.courses import clean_course_id
 
 
 class _PaginationForm(Form):
@@ -56,12 +57,10 @@ class ThreadListGetForm(_PaginationForm):
         return self.cleaned_data.get("order_direction") or "desc"
 
     def clean_course_id(self):
-        """Validate course_id"""
-        value = self.cleaned_data["course_id"]
-        try:
-            return CourseLocator.from_string(value)
-        except InvalidKeyError:
-            raise ValidationError("'{}' is not a valid course id".format(value))
+        """
+        Validate the course id
+        """
+        return clean_course_id(self)
 
     def clean_following(self):
         """Validate following"""

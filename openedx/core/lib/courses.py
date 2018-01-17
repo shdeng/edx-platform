@@ -63,7 +63,7 @@ def clean_course_id(model_form, is_required=True):
     Returns:
         (CourseKey) The cleaned and validated course_id as a CourseKey.
 
-    NOTE: This should ultimately replace all copies of "def clean_course_id".
+    NOTE: Use this method in model forms instead of a custom "clean_course_id" method!
 
     """
     cleaned_id = model_form.cleaned_data["course_id"]
