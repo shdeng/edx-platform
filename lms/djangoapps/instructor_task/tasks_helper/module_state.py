@@ -6,6 +6,7 @@ import logging
 from time import time
 
 from django.contrib.auth.models import User
+from django.utils.translation import ugettext_noop
 from opaque_keys.edx.keys import UsageKey
 
 import dogstats_wrapper as dog_stats_api
@@ -69,6 +70,7 @@ def perform_module_state_update(update_fcn, filter_fcn, _entry_id, course_id, ta
     problem_url = task_input.get('problem_url')
     entrance_exam_url = task_input.get('entrance_exam_url')
     student_identifier = task_input.get('student')
+    override_score_task = action_name == ugettext_noop('overridden')
     problems = {}
 
     # if problem_url is present make a usage key from it
@@ -85,27 +87,11 @@ def perform_module_state_update(update_fcn, filter_fcn, _entry_id, course_id, ta
         problems = get_problems_in_section(entrance_exam_url)
         usage_keys = [UsageKey.from_string(location) for location in problems.keys()]
 
-    # find the modules in question
-    modules_to_update = StudentModule.objects.filter(course_id=course_id, module_state_key__in=usage_keys)
+    modules_to_update = _get_modules_to_update(
+        course_id, usage_keys, student_identifier, filter_fcn, override_score_task
+    )
 
-    # give the option of updating an individual student. If not specified,
-    # then updates all students who have responded to a problem so far
-    student = None
-    if student_identifier is not None:
-        # if an identifier is supplied, then look for the student,
-        # and let it throw an exception if none is found.
-        if "@" in student_identifier:
-            student = User.objects.get(email=student_identifier)
-        elif student_identifier is not None:
-            student = User.objects.get(username=student_identifier)
-
-    if student is not None:
-        modules_to_update = modules_to_update.filter(student_id=student.id)
-
-    if filter_fcn is not None:
-        modules_to_update = filter_fcn(modules_to_update)
-
-    task_progress = TaskProgress(action_name, modules_to_update.count(), start_time)
+    task_progress = TaskProgress(action_name, len(modules_to_update), start_time)
     task_progress.update_task_state()
 
     for module_to_update in modules_to_update:
@@ -406,3 +392,39 @@ def _get_task_id_from_xmodule_args(xmodule_instance_args):
         return UNKNOWN_TASK_ID
     else:
         return xmodule_instance_args.get('task_id', UNKNOWN_TASK_ID)
+
+
+def _get_modules_to_update(course_id, usage_keys, student_identifier, filter_fcn, override_score_task):
+    """
+    Fetches a StudentModule instances for a given `course_id`, `student` object, and `usage_keys`.
+    """
+    def get_student():
+        """
+        Fetches student instance if an identifier is provided and
+        let it throw an exception if none is found.
+        """
+        if student_identifier is None:
+            return None
+
+        student_identifier_type = 'email' if '@' in student_identifier else 'username'
+        student_query_params = {student_identifier_type: student_identifier}
+        return User.objects.get(**student_query_params)
+
+    module_query_params = {'course_id': course_id, 'module_state_keys': usage_keys}
+
+    # give the option of updating an individual student. If not specified,
+    # then updates all students who have responded to a problem so far
+    student = get_student()
+    if student:
+        module_query_params['student_id'] = student.id
+
+    student_modules = StudentModule.get_state_by_params(**module_query_params)
+    if filter_fcn is not None:
+        student_modules = filter_fcn(student_modules)
+
+    if override_score_task and student_modules.count() == 0:
+        student_modules = [
+            StudentModule.objects.get_or_create(course_id=course_id, student=student, module_state_key=key)[0]
+            for key in usage_keys
+        ]
+    return student_modules
