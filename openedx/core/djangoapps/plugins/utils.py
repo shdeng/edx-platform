@@ -30,15 +30,6 @@ def import_attr(attr_path):
     return import_string(attr_path)
 
 
-def import_attr_at_module_path(module_path, attr_name):
-    """
-    Import and returns the attribute with name attr_name
-    in the module at module_path.
-    """
-    imported_module = import_module(module_path)
-    return getattr(imported_module, attr_name)
-
-
 def import_attr_in_module(imported_module, attr_name):
     """
     Import and returns the attribute with name attr_name
