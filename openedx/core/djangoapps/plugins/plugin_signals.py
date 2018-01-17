@@ -21,7 +21,7 @@ def _iter_receivers(signals_module, signals_config):
             signals_module,
             receiver_config[constants.PluginSignals.RECEIVER_FUNC_NAME],
         )
-        signal = utils.parse_and_import_module_attr(receiver_config[constants.PluginSignals.SIGNAL_PATH])
+        signal = utils.import_attr(receiver_config[constants.PluginSignals.SIGNAL_PATH])
         yield signal, receiver_func, receiver_config
 
 
@@ -53,7 +53,7 @@ def _get_config(app_config, project_type):
 def _get_sender(receiver_config):
     sender_path = receiver_config.get(constants.PluginSignals.SENDER_PATH)
     if sender_path:
-        sender = utils.parse_and_import_module_attr(sender_path)
+        sender = utils.import_attr(sender_path)
         return sender
 
 

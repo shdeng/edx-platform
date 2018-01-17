@@ -1,3 +1,4 @@
+from django.utils.module_loading import import_string
 from importlib import import_module as system_import_module
 
 
@@ -18,16 +19,15 @@ def get_module_path(app_config, plugin_config, plugin_cls):
     )
 
 
-def parse_and_import_module_attr(attr_path):
+def import_attr(attr_path):
     """
     Import and returns a module's attribute at the specific path.
 
     Args:
         attr_path should be of the form:
-            {full_module_path}:attr_name
+            {full_module_path}.attr_name
     """
-    module_path, attr_name = attr_path.split(':')
-    return import_attr_at_module_path(module_path, attr_name)
+    return import_string(attr_path)
 
 
 def import_attr_at_module_path(module_path, attr_name):

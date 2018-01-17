@@ -173,7 +173,7 @@ class::
                         PluginSignals.RECEIVER_FUNC_NAME: u'on_signal_x',
 
                         # The full path to the module where the signal is defined.
-                        PluginSignals.SIGNAL_PATH: u'full_path_to_signal_x',
+                        PluginSignals.SIGNAL_PATH: u'full_path_to_signal_x_module.SignalX',
 
                         # The value for dispatch_uid to pass to Signal.connect to prevent duplicate signals.
                         # Optional; Defaults to full path to the signal's receiver function.
