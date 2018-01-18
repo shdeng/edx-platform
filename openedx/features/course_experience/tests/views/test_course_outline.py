@@ -30,7 +30,6 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
         Set up an array of various courses to be tested.
         """
         # setUpClassAndTestData() already calls setUpClass on SharedModuleStoreTestCase
-        # pylint: disable=super-method-not-called
         with super(TestCourseOutlinePage, cls).setUpClassAndTestData():
             cls.courses = []
             course = CourseFactory.create()
@@ -123,7 +122,6 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase):
         Creates a test course that can be used for non-destructive tests
         """
         # setUpClassAndTestData() already calls setUpClass on SharedModuleStoreTestCase
-        # pylint: disable=super-method-not-called
         with super(TestCourseOutlineResumeCourse, cls).setUpClassAndTestData():
             cls.course = cls.create_test_course()
 
@@ -231,7 +229,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase):
 
         # remove one of the sequentials from the chapter
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course.id):
-            self.store.delete_item(sequential.location, self.user.id)  # pylint: disable=no-member
+            self.store.delete_item(sequential.location, self.user.id)
 
         # check resume course buttons
         response = self.client.get(course_home_url(course))
@@ -260,7 +258,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase):
         # remove all sequentials from chapter
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course.id):
             for sequential in chapter.children:
-                self.store.delete_item(sequential.location, self.user.id)  # pylint: disable=no-member
+                self.store.delete_item(sequential.location, self.user.id)
 
         # check resume course buttons
         response = self.client.get(course_home_url(course))

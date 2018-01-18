@@ -6,13 +6,13 @@ This includes any locally defined CourseTools.
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
-from course_tools import CourseTool
 from courseware.courses import get_course_by_id
 from student.models import CourseEnrollment
-from views.course_reviews import CourseReviewsModuleFragmentView
-from views.course_updates import CourseUpdatesFragmentView
 
 from . import SHOW_REVIEWS_TOOL_FLAG, UNIFIED_COURSE_TAB_FLAG
+from .course_tools import CourseTool
+from .views.course_reviews import CourseReviewsModuleFragmentView
+from .views.course_updates import CourseUpdatesFragmentView
 
 
 class CourseUpdatesTool(CourseTool):
@@ -27,14 +27,14 @@ class CourseUpdatesTool(CourseTool):
         return 'edx.updates'
 
     @classmethod
-    def title(cls):
+    def title(cls, course_key):
         """
         Returns the title of this tool.
         """
         return _('Updates')
 
     @classmethod
-    def icon_classes(cls):
+    def icon_classes(cls, course_key):
         """
         Returns icon classes needed to represent this tool.
         """
