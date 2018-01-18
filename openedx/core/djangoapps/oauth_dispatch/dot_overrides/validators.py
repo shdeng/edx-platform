@@ -38,6 +38,8 @@ if django.VERSION < (1, 10):
 else:
     # Django 1.10+ disallows inactive users from authenticating unless using the backend below.
     from django.contrib.auth.backends import AllowAllUsersModelBackend as UserModelBackend
+
+
 class EdxRateLimitedAllowAllUsersModelBackend(RateLimitMixin, UserModelBackend):
     """
     Authentication backend needed to incorporate rate limiting of logins - but also
